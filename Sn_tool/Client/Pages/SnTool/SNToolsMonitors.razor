@@ -1,0 +1,173 @@
+﻿@page "/SNToolsMonitorsPage"
+@inject HttpClient Http
+@using Sn_tool.Shared.Data;
+@using Syncfusion.Blazor.Cards;
+@using Syncfusion.Blazor.Inputs;
+@using Syncfusion.Blazor.Buttons;
+@using Syncfusion.Blazor.Grids;
+@using Syncfusion.Blazor.Layouts;
+@using Syncfusion.Blazor.Spinner;
+@using Syncfusion.Blazor.Navigations;
+
+
+    <div class="alert alert-secondary" role="alert">
+        <h3 class="h2Naglowek">Monitors</h3>
+    </div>
+
+
+
+<SfSplitter Height="150px" Width="100%">
+    <SplitterPanes>
+        <SplitterPane Size="25%">
+            <ContentTemplate>
+                <div>
+                    <div class="content">
+                        <h3 class="h3">Serial No </h3>
+                        <SfTextBox Placeholder="Serial number" @bind-Value="@sSerialNumber"></SfTextBox>
+                    </div>
+                </div>
+            </ContentTemplate>
+        </SplitterPane>
+        <SplitterPane Size="25%">
+            <div>
+                <div class="content">
+                    <h3 class="h3"> Delivery Nr </h3>
+                    <SfTextBox Placeholder="Ship to name " @bind-Value="@sDN"></SfTextBox>
+                </div>
+            </div>
+        </SplitterPane>
+        <SplitterPane Size="25%">
+            <div>
+                <div class="content">
+                    <h3 class="h3">Part no(Id) </h3>
+                    <SfTextBox Placeholder="Ship to number" @bind-Value="@sPartNumber"></SfTextBox>
+                </div>
+            </div>
+        </SplitterPane>
+        <SplitterPane Size="25%">
+            <div>
+                <div class="content">
+                    <h3 class="h3">Ship to name  </h3>
+                    <SfTextBox Placeholder="SAP delivery nr " @bind-Value="@sShipToName"></SfTextBox>
+                </div>
+            </div>
+        </SplitterPane>
+    </SplitterPanes>
+</SfSplitter>
+
+<SfButton CssClass="e-btn e-outline e-primary" OnClick="loadData">Select data</SfButton>
+<div id="container"></div>
+<SfSpinner @ref="SpinnerObj" Target="#container" CssClass="e-customClass" Label="Loading...." Width="50px">
+</SfSpinner>
+
+
+@if (listMNTSn.Count() > 0)
+{
+    <div id="containerGrid">
+        <SfGrid DataSource="@listMNTSn" @ref="DefaultGrid" AllowSorting="true" AllowExcelExport="true" AllowPaging="true">
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+
+            <GridColumns>
+                <GridColumn Field=@nameof(SnMNT.SerialNumber) HeaderText="Serial nr" TextAlign="TextAlign.Left" Width="50"></GridColumn>
+                <GridColumn Field=@nameof(SnMNT.GoodsIssueDate) HeaderText="Issue Date" TextAlign="TextAlign.Left" Width="60"></GridColumn>
+                <GridColumn Field=@nameof(SnMNT.Plant) HeaderText="Plant" TextAlign="TextAlign.Left" Width="40"></GridColumn>
+                <GridColumn Field=@nameof(SnMNT.DN) HeaderText="DN" TextAlign="TextAlign.Left" Width="60"></GridColumn>
+                <GridColumn Field=@nameof(SnMNT.ShipToName) HeaderText="Ship to name" TextAlign="TextAlign.Left" Width="180"></GridColumn>
+                <GridColumn Field=@nameof(SnMNT.PartNumber) HeaderText="Part No " TextAlign="TextAlign.Left" Width="80"></GridColumn>
+
+            </GridColumns>
+        </SfGrid>
+        <SfButton OnClick="ExcelExport" Content="Excel Export"></SfButton>
+    </div>
+}
+
+
+
+<style>
+    .e-spinner-pane.e-customClass .e-spinner-inner .e-spin-material {
+        stroke: #808080;
+    }
+
+    .e-input-group.e-corner {
+        border-radius: 10px !important;
+    }
+
+    .e-input-group {
+        background: #d1d8e6 !important;
+        color: blue !important;
+    }
+    .h2Naglowek {
+        margin-left: 500px;
+    }
+</style>
+
+@code {
+    public string sDN = "";
+    public string sPartNumber = "";
+    public string sSerialNumber = "";
+    public string sShipToName = "";
+    SfSpinner SpinnerObj;
+    private string Target { get; set; } = "#container";
+    private SfGrid<SnMNT> DefaultGrid;
+
+    public SnMNT[] SnMNTList = { };
+    List<SnMNT> listMNTSn = new List<SnMNT>();
+
+    public int recNo;
+
+    async Task loadData()
+    {
+        SpinnerObj.ShowSpinner(Target);
+
+        if (sSerialNumber.Trim().Length > 0)
+        {
+            string linktmp = "/api/SnMNTs/GetSnByMNTSn/" + sSerialNumber.Trim();
+            Console.WriteLine("-----------link----------" + linktmp);
+            SnMNTList = await Http.GetFromJsonAsync<SnMNT[]>(linktmp);
+            listMNTSn = new List<SnMNT>(SnMNTList);
+            recNo = listMNTSn.Count();
+        }
+
+        if (sDN.Trim().Length > 0)
+        {
+            string linktmp = "/api/SnMNTs/GetSnByMNTDn/" + sDN.Trim();
+            Console.WriteLine("-----------link----------" + linktmp);
+            SnMNTList = await Http.GetFromJsonAsync<SnMNT[]>(linktmp);
+            listMNTSn = new List<SnMNT>(SnMNTList);
+            recNo = listMNTSn.Count();
+
+        }
+
+        if (sPartNumber.Trim().Length > 0)
+        {
+            string linktmp = "/api/SnMNTs/GetSnByMNTPn/" + sPartNumber.Trim();
+            Console.WriteLine("-----------link----------" + linktmp);
+            SnMNTList = await Http.GetFromJsonAsync<SnMNT[]>(linktmp);
+            listMNTSn = new List<SnMNT>(SnMNTList);
+            recNo = listMNTSn.Count();
+        }
+
+        if (sShipToName.Trim().Length > 0)
+        {
+            ///api/SnMNTs/GetSnByMNTStn/
+            string linktmp = "/api/SnMNTs/GetSnByMNTStn/" + sShipToName.Trim();
+            Console.WriteLine("-----------link----------" + linktmp);
+            SnMNTList = await Http.GetFromJsonAsync<SnMNT[]>(linktmp);
+            listMNTSn = new List<SnMNT>(SnMNTList);
+            recNo = listMNTSn.Count();
+
+        }
+
+        SpinnerObj.HideSpinner(Target);
+    }
+
+
+    public async Task ExcelExport()
+    {
+        ExcelExportProperties ExportProperties = new ExcelExportProperties();
+        ExportProperties.ExportType = ExportType.AllPages;
+
+        await this.DefaultGrid.ExcelExport(ExportProperties);
+    }
+
+}

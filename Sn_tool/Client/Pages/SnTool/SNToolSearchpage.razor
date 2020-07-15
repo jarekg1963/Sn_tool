@@ -1,0 +1,45 @@
+﻿@page "/SNToolSearch"
+@using Syncfusion.Blazor.Grids
+@using Sn_tool.Shared.Data
+@inject HttpClient Http
+
+<h3>SN Tools : reno @recNo.ToString()</h3>
+
+<div id="container">
+    <SfGrid DataSource="@listSn" AllowSorting="true" AllowFiltering="true" AllowPaging="true">
+        <GridPageSettings PageSizes="true"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field=@nameof(Sn.SerialNumber) HeaderText="Serial nr" TextAlign="TextAlign.Right" Width="140"></GridColumn>
+            <GridColumn Field=@nameof(Sn.Material) HeaderText="Material" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(Sn.DateScanned) HeaderText="Date"  Format="d" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(Sn.Warehouse) HeaderText="Pant" TextAlign="TextAlign.Right" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(Sn.WarehouseName) HeaderText="Shipper from" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(Sn.SapdeliveryNumber) HeaderText="Sap DN" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(Sn.ShiptoNumber) HeaderText="Ship to" TextAlign="TextAlign.Right" Width="80"></GridColumn>
+            <GridColumn Field=@nameof(Sn.ShiptoName) HeaderText="Ship to name" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+            <GridColumn Field=@nameof(Sn.ShiptoAddress) HeaderText="Ship to adress" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+
+@code {
+    public Sn[] SnList = {  };
+    List<Sn> listSn = new List<Sn>();
+    public int recNo = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await loadData();
+        StateHasChanged();
+    }
+
+    async Task loadData()
+    {
+        SnList = await Http.GetFromJsonAsync<Sn[]>("api/Sns");
+         listSn = new List<Sn>(SnList);
+        recNo = listSn.Count();
+
+    }
+
+
+}
