@@ -8,11 +8,15 @@
 @using Syncfusion.Blazor.Layouts;
 @using Syncfusion.Blazor.Spinner;
 @using Syncfusion.Blazor.Navigations;
+@using Syncfusion.Blazor.Popups;
 
 
-    <div class="alert alert-secondary" role="alert">
-        <h3 class="h2Naglowek">Monitors</h3>
-    </div>
+
+
+
+<div class="alert alert-secondary" role="alert">
+    <h3 class="h2Naglowek">Monitors</h3>
+</div>
 
 
 
@@ -31,8 +35,8 @@
         <SplitterPane Size="25%">
             <div>
                 <div class="content">
-                    <h3 class="h3"> Delivery Nr </h3>
-                    <SfTextBox Placeholder="Ship to name " @bind-Value="@sDN"></SfTextBox>
+                    <h3 class="h3"> Delivery nr </h3>
+                    <SfTextBox Placeholder="Delivery nr " @bind-Value="@sDN"></SfTextBox>
                 </div>
             </div>
         </SplitterPane>
@@ -40,7 +44,7 @@
             <div>
                 <div class="content">
                     <h3 class="h3">Part no(Id) </h3>
-                    <SfTextBox Placeholder="Ship to number" @bind-Value="@sPartNumber"></SfTextBox>
+                    <SfTextBox Placeholder="Part number" @bind-Value="@sPartNumber"></SfTextBox>
                 </div>
             </div>
         </SplitterPane>
@@ -48,7 +52,7 @@
             <div>
                 <div class="content">
                     <h3 class="h3">Ship to name  </h3>
-                    <SfTextBox Placeholder="SAP delivery nr " @bind-Value="@sShipToName"></SfTextBox>
+                    <SfTextBox Placeholder="Ship to name " @bind-Value="@sShipToName"></SfTextBox>
                 </div>
             </div>
         </SplitterPane>
@@ -63,26 +67,79 @@
 
 @if (listMNTSn.Count() > 0)
 {
-    <div id="containerGrid">
+<div id="containerGrid">
+  
         <SfGrid DataSource="@listMNTSn" @ref="DefaultGrid" AllowSorting="true" AllowExcelExport="true" AllowPaging="true">
             <GridPageSettings PageSizes="true"></GridPageSettings>
-
             <GridColumns>
-                <GridColumn Field=@nameof(SnMNT.SerialNumber) HeaderText="Serial nr" TextAlign="TextAlign.Left" Width="50"></GridColumn>
+                <GridEvents RowSelected="RowSelectHandler" TValue="SnMNT"></GridEvents>
+                <GridColumn Field=@nameof(SnMNT.SerialNumber) HeaderText="Serial nr" TextAlign="TextAlign.Left" Width="70"></GridColumn>
                 <GridColumn Field=@nameof(SnMNT.GoodsIssueDate) HeaderText="Issue Date" TextAlign="TextAlign.Left" Width="60"></GridColumn>
                 <GridColumn Field=@nameof(SnMNT.Plant) HeaderText="Plant" TextAlign="TextAlign.Left" Width="40"></GridColumn>
                 <GridColumn Field=@nameof(SnMNT.DN) HeaderText="DN" TextAlign="TextAlign.Left" Width="60"></GridColumn>
                 <GridColumn Field=@nameof(SnMNT.ShipToName) HeaderText="Ship to name" TextAlign="TextAlign.Left" Width="180"></GridColumn>
                 <GridColumn Field=@nameof(SnMNT.PartNumber) HeaderText="Part No " TextAlign="TextAlign.Left" Width="80"></GridColumn>
-
             </GridColumns>
         </SfGrid>
         <SfButton OnClick="ExcelExport" Content="Excel Export"></SfButton>
+</div>
+
+<SfDialog Width="1000" Height="500" IsModal="true" @bind-Visible="@IsVisibleMNT">
+    <div class="container">
+        <div class="row" style="height: 80px">
+            <div class="col-12">
+                <div class="alert alert-secondary" role="alert">
+                    <h3 class="h2Naglowek" style="margin-left:400px">Details</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="height: 80px">
+            <div class="col-4">
+            <p>Serial No</p>
+              <SfTextBox Value="@SnSerialNumber" Readonly="true"></SfTextBox>
+        </div>
+        <div class="col-4">
+            <p>Plant</p>
+            <SfTextBox Value="@SnPlant" Readonly="true"></SfTextBox>
+        </div>
+        <div class="col-4">
+            <p>SAP Dn nymber</p>
+            <SfTextBox Value="@SnDN" Readonly="true"></SfTextBox>
+        </div>
+        </div>
+
+        <div class="row" style="height: 80px">
+            <div class="col-12">
+                <p>Ship to name </p>
+                <SfTextBox Value="@SnSchipToName" Readonly="true"></SfTextBox>
+            </div>
+        </div>
+
+        <div class="row" style="height: 80px">
+            <div class="col-4">
+            <p>Part number</p>
+            <SfTextBox Value="@SnPartNumber" Readonly="true"></SfTextBox>
+        </div>
+        <div class="col-4">
+            <p>Date goods issue </p>
+          <SfTextBox Value="@SnGoodsIssueDate" Readonly="true"></SfTextBox>
+        </div>
+
+        </div>
+        <div class="row" style="height: 80px">
+            <div class="col-12">
+                <p>File name </p>
+                <SfTextBox Value="@SnFileName" Readonly="true"></SfTextBox>
+            </div>
+        </div>
+        <div class="row" style="margin-left: 4px">
+            <SfButton @onclick="CloseModal" CssClass="e-large">Close </SfButton>
+        </div>
     </div>
+</SfDialog>
+
+    
 }
-
-
-
 <style>
     .e-spinner-pane.e-customClass .e-spinner-inner .e-spin-material {
         stroke: #808080;
@@ -96,6 +153,7 @@
         background: #d1d8e6 !important;
         color: blue !important;
     }
+
     .h2Naglowek {
         margin-left: 500px;
     }
@@ -109,11 +167,18 @@
     SfSpinner SpinnerObj;
     private string Target { get; set; } = "#container";
     private SfGrid<SnMNT> DefaultGrid;
-
     public SnMNT[] SnMNTList = { };
     List<SnMNT> listMNTSn = new List<SnMNT>();
-
+    private bool IsVisibleMNT { get; set; } = false;
     public int recNo;
+    public string SnGoodsIssueDate = "";
+    public string SnPlant = "";
+    public string SnDN = "";
+    public string SnSchipToName = "";
+    public string SnPartNumber = "";
+    public string SnSerialNumber = "";
+    public string SnFileName = "";
+    private bool IsVisible { get; set; } = false;
 
     async Task loadData()
     {
@@ -140,7 +205,7 @@
 
         if (sPartNumber.Trim().Length > 0)
         {
-            string linktmp = "/api/SnMNTs/GetSnByMNTPn/" + sPartNumber.Trim();
+            string linktmp = "/api/SnMNTs/GetSnByMNTPn/?MNTPn=" + System.Web.HttpUtility.UrlEncode(sPartNumber.Trim());
             Console.WriteLine("-----------link----------" + linktmp);
             SnMNTList = await Http.GetFromJsonAsync<SnMNT[]>(linktmp);
             listMNTSn = new List<SnMNT>(SnMNTList);
@@ -170,4 +235,29 @@
         await this.DefaultGrid.ExcelExport(ExportProperties);
     }
 
+    public void RowSelectHandler(RowSelectEventArgs<SnMNT> args)
+    {
+        this.IsVisibleMNT = true;
+
+        SnGoodsIssueDate = args.Data.GoodsIssueDate.ToString();
+        SnPlant = args.Data.Plant.ToString();
+        SnDN = args.Data.DN.ToString();
+        SnSchipToName = args.Data.ShipToName.ToString();
+        SnPartNumber = args.Data.PartNumber.ToString();
+        SnSerialNumber = args.Data.SerialNumber.ToString();
+        
+        if (args.Data.FileName is null)
+        { SnFileName = ""; } else {
+            SnFileName = args.Data.FileName.ToString(); }
+
+
+        Console.WriteLine(" Wiesz wybor" + args.Data.ID.ToString());
+    }
+
+
+    private void CloseModal()
+    {
+        this.IsVisibleMNT = false;
+    }
 }
+

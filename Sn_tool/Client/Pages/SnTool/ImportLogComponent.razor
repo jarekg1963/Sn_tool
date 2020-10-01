@@ -1,0 +1,93 @@
+﻿@page "/importLogPage";
+@inject HttpClient Http;
+@using Sn_tool.Shared.Data;
+@using Syncfusion.Blazor.Grids;
+@using Syncfusion.Blazor.Buttons;
+@using Syncfusion.Blazor.Spinner;
+
+
+<div class="alert alert-secondary" role="alert">
+    <h3 class="h2Naglowek">Import log </h3>
+</div>
+
+@if (listLogForGrid.Count() == 0)
+{<p>Loading ... </p>}
+else
+{
+    <div id="containerGrid">
+        <SfGrid DataSource="@listLogForGrid" @ref="DefaultGrid" AllowSorting="true" AllowExcelExport="true" AllowPaging="true" AllowFiltering="true">
+            <GridPageSettings PageSizes="true"></GridPageSettings>
+
+            <GridColumns>
+
+                <GridColumn Field=@nameof(ImportLog.Id) HeaderText="Id" TextAlign="TextAlign.Left" Width="40"></GridColumn>
+                <GridColumn Field=@nameof(ImportLog.DataLog) HeaderText="Data" TextAlign="TextAlign.Left" Width="100"></GridColumn>
+                <GridColumn Field=@nameof(ImportLog.Operation) HeaderText="Operation" Format="d" TextAlign="TextAlign.Left" Width="180"></GridColumn>
+                <GridColumn Field=@nameof(ImportLog.Plant) HeaderText="File" TextAlign="TextAlign.Left" Width="60"></GridColumn>
+                <GridColumn Field=@nameof(ImportLog.FileName) HeaderText="Filename" TextAlign="TextAlign.Left" Width="220"></GridColumn>
+                <GridColumn Field=@nameof(ImportLog.ProductGroup) HeaderText="Group" TextAlign="TextAlign.Left" Width="20"></GridColumn>
+
+            </GridColumns>
+        </SfGrid>
+        <SfButton OnClick="ExcelExport" Content="Excel Export"></SfButton>
+    </div>
+    <div id="container"></div>
+    <SfSpinner @ref="SpinnerObj" Target="#container" CssClass="e-customClass" Label="Loading...." Width="50px">
+    </SfSpinner>
+
+
+}
+
+@code {
+    public ImportLog[] LogList = { };
+    List<ImportLog> listLogForGrid = new List<ImportLog>();
+    public int recNo = 0;
+    private SfGrid<ImportLog> DefaultGrid;
+    SfSpinner SpinnerObj;
+    private string Target { get; set; } = "#container";
+
+    async Task loadData()
+    {
+
+    //    SpinnerObj.ShowSpinner(Target);
+        string linktmp = "/api/ImportLogs/";
+
+        LogList = await Http.GetFromJsonAsync<ImportLog[]>(linktmp);
+        listLogForGrid = new List<ImportLog>(LogList);
+        recNo = listLogForGrid.Count();
+    //    SpinnerObj.HideSpinner(Target);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await loadData();
+        StateHasChanged();
+    }
+
+    public async Task ExcelExport()
+    {
+        ExcelExportProperties ExportProperties = new ExcelExportProperties();
+        ExportProperties.ExportType = ExportType.AllPages;
+
+        await this.DefaultGrid.ExcelExport(ExportProperties);
+    }
+}
+
+<style>
+    .e-spinner-pane.e-customClass .e-spinner-inner .e-spin-material {
+        stroke: #808080;
+    }
+
+    .e-input-group.e-corner {
+        border-radius: 10px !important;
+    }
+
+    .e-input-group {
+        background: #d1d8e6 !important;
+        color: blue !important;
+    }
+
+    .h2Naglowek {
+        margin-left: 500px;
+    }
+</style>

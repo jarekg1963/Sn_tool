@@ -1,0 +1,51 @@
+﻿@page "/statisticsPage"
+@using Sn_tool.Shared
+@inject HttpClient Http
+@using Syncfusion.Blazor.Charts
+
+<div class="container" style="margin-bottom:20px">
+
+    <SfChart Title="Monitors " Width="100%">
+
+        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+       
+        <ChartSeriesCollection>
+            <ChartSeries DataSource="@listDailyMonotors" XName="GoodsIssueDate" YName="DailyQuantity" Type="ChartSeriesType.Line">
+            </ChartSeries>
+        </ChartSeriesCollection>
+    </SfChart>
+    <hr />
+    <SfChart Title="TV " Width="100%">
+        <ChartPrimaryXAxis  IntervalType="IntervalType.Months" ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime">
+        </ChartPrimaryXAxis>
+            <ChartSeriesCollection>
+                <ChartSeries DataSource="@listDailyTV" XName="DateScanned" YName="DailyQuantity" Type="ChartSeriesType.Line">
+                </ChartSeries>
+            </ChartSeriesCollection>
+    </SfChart>
+</div>
+@code {
+    public VMNTDailyquantitySn[] DailyMonotors = { };
+    List<VMNTDailyquantitySn> listDailyMonotors = new List<VMNTDailyquantitySn>();
+
+    public VTVDailyquatitySn[] DailyTV = { };
+    List<VTVDailyquatitySn> listDailyTV = new List<VTVDailyquatitySn>();
+
+    async Task loadData()
+    {
+        DailyMonotors = await Http.GetFromJsonAsync<VMNTDailyquantitySn[]>("/api/VMNTDailyquantitySn");
+        listDailyMonotors = new List<VMNTDailyquantitySn>(DailyMonotors);
+
+        DailyTV = await Http.GetFromJsonAsync<VTVDailyquatitySn[]>("/api/VTVDailyquatitySn");
+        listDailyTV = new List<VTVDailyquatitySn>(DailyTV);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await loadData();
+
+        Console.WriteLine("Ilosc TV dziennie " + listDailyTV.Count().ToString());
+        Console.WriteLine("Ilosc Mnt dziennie " + listDailyMonotors.Count().ToString());
+        StateHasChanged();
+    }
+}

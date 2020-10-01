@@ -13,6 +13,7 @@ namespace Sn_tool.Shared.Data
         public string PartNumber { get; set; }
         public string SerialNumber { get; set; }
        
+        public string FileName { get; set; }
         public int ID { get; set; }
     }
 }

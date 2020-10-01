@@ -7,6 +7,8 @@
 @using Syncfusion.Blazor.Grids;
 @using Syncfusion.Blazor.Layouts;
 @using Syncfusion.Blazor.Spinner
+@using Syncfusion.Blazor.Popups;
+
 
 
 <div class="alert alert-secondary" role="alert">
@@ -67,11 +69,12 @@
             <GridPageSettings PageSizes="true"></GridPageSettings>
 
             <GridColumns>
+                <GridEvents RowSelected="RowSelectHandler" TValue="Sn"></GridEvents>
                 <GridColumn Field=@nameof(Sn.SerialNumber) HeaderText="Serial nr" TextAlign="TextAlign.Right" Width="140"></GridColumn>
                 <GridColumn Field=@nameof(Sn.Material) HeaderText="Material" TextAlign="TextAlign.Right" Width="140"></GridColumn>
                 <GridColumn Field=@nameof(Sn.DateScanned) HeaderText="Date" Format="d" TextAlign="TextAlign.Right" Width="100"></GridColumn>
-                <GridColumn Field=@nameof(Sn.Warehouse) HeaderText="Pant" TextAlign="TextAlign.Right" Width="80"></GridColumn>
-                <GridColumn Field=@nameof(Sn.WarehouseName) HeaderText="Shipper from" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Sn.Warehouse) HeaderText="Plant" TextAlign="TextAlign.Right" Width="80"></GridColumn>
+                <GridColumn Field=@nameof(Sn.WarehouseName) HeaderText="Ship from" TextAlign="TextAlign.Right" Width="120"></GridColumn>
                 <GridColumn Field=@nameof(Sn.SapdeliveryNumber) HeaderText="Sap DN" TextAlign="TextAlign.Right" Width="120"></GridColumn>
                 <GridColumn Field=@nameof(Sn.ShiptoNumber) HeaderText="Ship to" TextAlign="TextAlign.Right" Width="100"></GridColumn>
                 <GridColumn Field=@nameof(Sn.ShiptoName) HeaderText="Ship to name" TextAlign="TextAlign.Right" Width="120"></GridColumn>
@@ -80,7 +83,88 @@
         </SfGrid>
         <SfButton OnClick="ExcelExport" Content="Excel Export"></SfButton>
     </div>
+
+    <SfDialog Width="1000" Height="650" IsModal="true" @bind-Visible="@IsVisible">
+        <div class="container">
+            <div class="row" style="height: 80px">
+                <div class="col-12">
+                    <div class="alert alert-secondary" role="alert">
+                        <h3 class="h2Naglowek" style="margin-left:400px">Details</h3>
+                    </div>
+                </div>
+                </div>
+                    <div class="row" style="height: 80px">
+                        <div class="col-4">
+                            <p>Serial No</p>
+                            <SfTextBox Value="@SnSerialNo" Readonly="true"></SfTextBox>
+                        </div>
+                        <div class="col-4">
+                            <p>Material</p>
+                            <SfTextBox Value="@SnMaterial" Readonly="true"></SfTextBox>
+                        </div>
+                        <div class="col-4">
+                            <p>Scanned Date</p>
+                            <SfTextBox Value="@SnDate" Readonly="true"></SfTextBox>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 80px">
+                        <div class="col-4">
+                            <p>Plant</p>
+                            <SfTextBox Value="@SnSalesOrganization" Readonly="true"></SfTextBox>
+                        </div>
+                        <div class="col-4">
+                            <p>Ship to number</p>
+                            <SfTextBox Value="@SnShipToNumber" Readonly="true"></SfTextBox>
+                        </div>
+                        <div class="col-4">
+                            <p>Delivery note</p>
+                            <SfTextBox Value="@SnSapDeliveryNote" Readonly="true"></SfTextBox>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 80px">
+                        <div class="col-12">
+                            <p>Ship to name </p>
+                            <SfTextBox Value="@SnSchipToName" Readonly="true"></SfTextBox>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 80px">
+                        <div class="col-12">
+                            <p>Sold to name</p>
+                            <SfTextBox Value="@SnSoldToName" Readonly="true"></SfTextBox>
+                        </div>
+                    </div>
+
+                    <div class="row" style="height: 80px">
+                        <div class="col-4">
+                            <p>Ship to adres</p>
+                            <SfTextBox Value="@SnShiptoAdres" Readonly="true"></SfTextBox>
+                        </div>
+                        <div class="col-4">
+                            <p>Warehouse</p>
+                            <SfTextBox Value="@SnWarehouse" Readonly="true"></SfTextBox>
+                        </div>
+                        <div class="col-4">
+                            <p>ID</p>
+                            <SfTextBox Value="@SnID" Readonly="true"></SfTextBox>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 80px">
+                        <div class="col-12">
+                            <p>File name </p>
+                            <SfTextBox Value="@SnFileName" Readonly="true"></SfTextBox>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-left: 4px">
+                        <SfButton @onclick="CloseModal" CssClass="e-large" >Close </SfButton>
+                    </div>
+                </div>
+</SfDialog>
+
+
 }
+
+
+
 
 <style>
     .e-spinner-pane.e-customClass .e-spinner-inner .e-spin-material {
@@ -95,6 +179,7 @@
         background: #d1d8e6 !important;
         color: blue !important;
     }
+
     .h2Naglowek {
         margin-left: 500px;
     }
@@ -105,14 +190,29 @@
     public Sn[] SnList = { };
     List<Sn> listSn = new List<Sn>();
     public int recNo = 0;
+    public string SnSerialNo = "";
+    public string SnMaterial = "";
+    public string SnDate = "";
     public string SnName = "";
     public string SnshipToName = "";
     public string SnshipToNumber = "";
     public string snDn = "";
+    public string SnSalesOrganization = "";
+    public string SnShipToNumber = "";
+    public string SnSapDeliveryNote = "";
+    public string SnSchipToName = "";
+    public string SnSoldToName = "";
+    public string SnShiptoAdres = "";
+    public string SnWarehouse = "";
+    public string SnID = "";
+    public string SnFileName = "";
+
     bool dataLoading = false;
     SfSpinner SpinnerObj;
     private string Target { get; set; } = "#container";
     private SfGrid<Sn> DefaultGrid;
+    private bool IsVisible { get; set; } = false;
+
 
     //protected override async Task OnInitializedAsync()
     //{
@@ -128,7 +228,7 @@
 
         if (SnName.Trim().Length > 0)
         {
-            string linktmp = "/api/Sns/GetSnBySn/" + SnName.Trim();
+            string linktmp = "/api/Sns/GetSnBySn/" + System.Web.HttpUtility.UrlPathEncode(SnName.Trim());
             Console.WriteLine("-----------link----------" + linktmp);
             SnList = await Http.GetFromJsonAsync<Sn[]>(linktmp);
             listSn = new List<Sn>(SnList);
@@ -172,5 +272,33 @@
         await this.DefaultGrid.ExcelExport(ExportProperties);
     }
 
+    public void RowSelectHandler(RowSelectEventArgs<Sn> args)
+    {
+        this.IsVisible = true;
 
+        SnSerialNo = args.Data.SerialNumber.ToString();
+        SnMaterial = args.Data.Material.ToString();
+        SnDate = args.Data.DateScanned.ToString();
+        SnSalesOrganization = args.Data.SalesOrganisation.ToString();
+        SnShipToNumber = args.Data.ShiptoNumber.ToString();
+        SnSapDeliveryNote = args.Data.SapdeliveryNumber.ToString();
+        SnSoldToName = args.Data.SoldtoName.ToString();
+        SnSchipToName = args.Data.ShiptoName.ToString();
+        SnShiptoAdres = args.Data.ShiptoAddress.ToString();
+        SnWarehouse = args.Data.Warehouse.ToString();
+        SnID = args.Data.Id.ToString();
+        SnFileName = args.Data.PalletId.ToString();
+
+        // Console.WriteLine(" Wiesz wybor" + args.Data.Id.ToString());
+    }
+
+    private void OnOverlayclick(MouseEventArgs arg)
+    {
+        // this.IsVisible = false;
+    }
+
+    private void CloseModal()
+    {
+        this.IsVisible = false;
+    }
 }

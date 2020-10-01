@@ -60,7 +60,8 @@ namespace Sn_tool.Server.Controllers
         }
 
         // GET: DN
-        [HttpGet("GetSnByMNTPn/{MNTPn}")]
+        // [HttpGet("GetSnByMNTPn/{MNTPn}")]
+        [HttpGet(nameof(GetSnByMNTPn))]
         public async Task<ActionResult<IEnumerable<SnMNT>>> GetSnByMNTPn(string MNTPn)
         {
             return await _context.Sn_MNT.Where(s => s.PartNumber.Trim() == MNTPn.Trim()).ToListAsync();

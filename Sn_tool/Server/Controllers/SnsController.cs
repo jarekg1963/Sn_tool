@@ -38,16 +38,21 @@ namespace Sn_tool.Server.Controllers
             {
                 return NotFound();
             }
-
+ 
             return sn;
         }
 
         // ------------------------Wyszukiwanie po numerze seryjnym 
         // GET: Get Sn ny Sn 
-        [HttpGet("GetSnBySn/{snNR}")]
+          [HttpGet("GetSnBySn/{snNR}")]
+       // [HttpGet(nameof(GetSnBySn))]
         public async Task<ActionResult<IEnumerable<Sn>>> GetSnBySn(string snNR)
         {
-             return await _context.Sn_TV.Where(s => s.SerialNumber.Trim() == snNR).ToListAsync();
+           
+            var temp= await _context.Sn_TV.Where(s => s.SerialNumber.Trim() == snNR.Trim()).ToListAsync();
+           
+          
+            return temp;
         }
         // ------------------------Wyszukiwanie po ship to name  
         [HttpGet("GetSnByShipTo/{snShipToName}")]

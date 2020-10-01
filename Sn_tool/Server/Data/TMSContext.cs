@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Sn_tool.Shared.Data;
+using Sn_tool.Shared;
 
 namespace Sn_tool.Server.Data
 {
@@ -17,10 +18,31 @@ namespace Sn_tool.Server.Data
         {
         }
 
+
         public virtual DbSet<Sn> Sn_TV { get; set; }
+
+        public virtual DbSet<VTVDailyquatitySn> VTVDailyquatitySn { get; set; }
+
+        public virtual DbSet<VMNTDailyquantitySn> VMNTDailyquantitySn { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<VMNTDailyquantitySn>(entity =>
+            {
+                entity.HasNoKey();
+
+            });
+
+
+
+            modelBuilder.Entity<VTVDailyquatitySn>(entity =>
+            {
+                entity.HasNoKey();
+
+            });
+
+
             modelBuilder.Entity<Sn>(entity =>
             {
                 entity.ToTable("SN_TV");
@@ -87,5 +109,7 @@ namespace Sn_tool.Server.Data
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
         public DbSet<Sn_tool.Shared.Data.SnMNT> Sn_MNT { get; set; }
+
+        public DbSet<Sn_tool.Shared.Data.ImportLog> ImportLog { get; set; }
     }
 }
